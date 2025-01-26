@@ -158,7 +158,7 @@ class InterfaceManager:
                 current_time, _ = self.audio_player.get_position()
                 self.lrc_manager.timestamp(self.lrc_manager.get_file_index(), current_time)
                 self._update_lrc()
-                self._location(self.lrc_manager.get_file_index(), self.lrc_file_length - 1, 1)
+                self._location(self.lrc_manager.get_file_index(), self.lrc_manager.get_file_length() - 1, 1)
                 if self.lrc_manager.get_file_index() > 5:
                     self._scroll_lrc_text()
             else:

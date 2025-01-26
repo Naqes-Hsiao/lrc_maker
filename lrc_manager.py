@@ -47,7 +47,7 @@ class LrcManager:
     def timestamp(self, index, time):
         if "]" not in self.__file_lines[index]:
             minute, second = self._adjust_time(time)
-            self.__file_lines[index] = f"[0{minute}:{second}]{self.__file_lines[index]}"
+            self.__file_lines[index] = f"[{minute}:{second}]{self.__file_lines[index]}"
             self.write(self.__file_lines)
 
     def change_timestamp(self):
@@ -65,7 +65,7 @@ class LrcManager:
                     change_minute += difference_minute
                     change_second += difference_second
                     change_minute, change_second = self._adjust_time(change_minute * 60 + change_second)
-                    character_lst[time_index] = f"0{change_minute}:{change_second}{change_time[9:]}"
+                    character_lst[time_index] = f"{change_minute}:{change_second}{change_time[9:]}"
                 self.__file_lines[index] = "<".join(character_lst)
         self.write(self.__file_lines)
 
@@ -84,6 +84,7 @@ class LrcManager:
             second = f"0{second:.3f}"
         else:
             second = f"{second:.3f}"
+        minute = f"0{int(minute)}"
         return minute, second
 
     def reset(self):
