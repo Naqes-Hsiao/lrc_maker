@@ -5,7 +5,7 @@ class LrcManager:
     def __init__(self):
         self.__file_path = None
         self.__file_length = 0
-        self.__file_lines = []
+        self.__file_lines = None
         self.__file_index = 0
 
     def get_file_length(self):
@@ -16,6 +16,9 @@ class LrcManager:
 
     def get_file_index(self):
         return self.__file_index
+
+    def set_file_index(self, index):
+        self.__file_index = index
 
     def load(self):
         self.__file_path = tkfd.askopenfilename(filetypes=[("歌词文件", "*.lrc")])
@@ -98,3 +101,6 @@ class LrcManager:
 
     def reset(self):
         self.__file_path = None
+        self.__file_length = 0
+        self.__file_lines = None
+        self.__file_index = 0
