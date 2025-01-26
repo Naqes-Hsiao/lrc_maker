@@ -21,73 +21,74 @@ class InterfaceManager:
         self.update_progress()
 
     def create_widgets(self):
+        self._configure_layout()
+        self._create_frames()
+        self._create_progress_bar()
+        self._create_audio_buttons()
+        self._create_lrc_buttons()
+        self._create_additional_buttons()
+        self._create_lrc_text()
+
+    def _configure_layout(self):
         self.window.rowconfigure(0, weight=1)
         self.window.rowconfigure(1, weight=1)
-
         self.window.columnconfigure(0, weight=2)
         self.window.columnconfigure(1, weight=1)
 
-        # 创建一个Frame，用于放置左边组件
-        frame_left = tk.Frame(self.window)
-        frame_left.grid(row=0, column=0, rowspan=2, pady=10)
+    def _create_frames(self):
+        self.frame_left = tk.Frame(self.window)
+        self.frame_left.grid(row=0, column=0, rowspan=2, pady=10)
 
-        # 创建一个Frame，用于放置右边组件
-        frame_right = tk.Frame(self.window)
-        frame_right.grid(row=0, column=1, pady=10)
+        self.frame_right = tk.Frame(self.window)
+        self.frame_right.grid(row=0, column=1, pady=10)
 
-        # 创建一个Frame，用于放置进度条
-        frame_progress_bar = tk.Frame(frame_right)
-        frame_progress_bar.pack()
+    def _create_progress_bar(self):
+        self.frame_progress_bar = tk.Frame(self.frame_right)
+        self.frame_progress_bar.pack()
 
-        # 进度条
-        self.progress_bar = tk.Scale(frame_progress_bar, from_=0, to=100, orient=tk.HORIZONTAL, length=400, tickinterval=10)
+        self.progress_bar = tk.Scale(self.frame_progress_bar, from_=0, to=100, orient=tk.HORIZONTAL, length=400, tickinterval=10)
         self.progress_bar.pack(pady=10)
         self.progress_bar.bind("<ButtonPress-1>", self.start_drag)
         self.progress_bar.bind("<B1-Motion>", self.drag_progress)
         self.progress_bar.bind("<ButtonRelease-1>", self.change_progress)
 
-        # 创建一个Frame，用于放置音频相关按钮
-        frame_audio = tk.Frame(frame_right)
-        frame_audio.pack()
+    def _create_audio_buttons(self):
+        self.frame_audio = tk.Frame(self.frame_right)
+        self.frame_audio.pack()
 
-        # 音频文件按钮
-        self.audio_file_button = tk.Button(frame_audio, text="加载音频文件", command=self.load_audio_file)
+        self.audio_file_button = tk.Button(self.frame_audio, text="加载音频文件", command=self.load_audio_file)
         self.audio_file_button.grid(row=0, column=0, padx=10, pady=10)
 
-        # 播放按钮
-        self.play_button = tk.Button(frame_audio, text="播放", command=self.play_audio)
+        self.play_button = tk.Button(self.frame_audio, text="播放", command=self.play_audio)
         self.play_button.grid(row=0, column=1, padx=10, pady=10)
 
-        # 创建一个Frame，用于放置歌词相关按钮
-        frame_lrc = tk.Frame(frame_right)
-        frame_lrc.pack(side=tk.TOP)
+    def _create_lrc_buttons(self):
+        self.frame_lrc = tk.Frame(self.frame_right)
+        self.frame_lrc.pack(side=tk.TOP)
 
-        # 创建一个按钮，用于加载歌词文件
-        self.lrc_file_button = tk.Button(frame_lrc, text="加载歌词文件", command=self.load_lrc_file)
+        self.lrc_file_button = tk.Button(self.frame_lrc, text="加载歌词文件", command=self.load_lrc_file)
         self.lrc_file_button.grid(row=0, column=0, padx=10, pady=10)
 
-        # 创建一个按钮，用于撤销操作
-        self.undo_button = tk.Button(frame_lrc, text="撤销", command=self.undo)
+        self.undo_button = tk.Button(self.frame_lrc, text="撤销", command=self.undo)
         self.undo_button.grid(row=0, column=1, padx=10, pady=10)
 
-        # 创建一个按钮，用于打轴
-        self.timestamp_button = tk.Button(frame_lrc, text="打轴", command=self.timestamp)
+        self.timestamp_button = tk.Button(self.frame_lrc, text="打轴", command=self.timestamp)
         self.timestamp_button.grid(row=0, column=2, padx=10, pady=10)
 
-        # 创建一个按钮，用于逐字调整
-        self.change_button = tk.Button(frame_right, text="逐字调整", command=self.change_timestamp)
+    def _create_additional_buttons(self):
+        self.change_button = tk.Button(self.frame_right, text="逐字调整", command=self.change_timestamp)
         self.change_button.pack(pady=10)
 
-        # 创建一个按钮，用于重置
-        self.restart_button = tk.Button(frame_right, text="重置", command=self.reset)
+        self.restart_button = tk.Button(self.frame_right, text="重置", command=self.reset)
         self.restart_button.pack(pady=10)
 
-        # 创建一个Text，用于显示歌词
-        self.lrc_text = tk.Text(frame_left, width=100, height=50, font=("宋体", 12))
+    def _create_lrc_text(self):
+        self.lrc_text = tk.Text(self.frame_left, width=100, height=50, font=("宋体", 12))
         self.lrc_text.pack()
         self.lrc_text.config(state=tk.DISABLED)
         self.lrc_text.tag_config("highlight", background="yellow", foreground="red")
         self.lrc_text.bind("<Button-1>", self.highlight_line)
+
 
     def update_progress(self):
         if self.play_button.cget("text") == "暂停":
