@@ -55,7 +55,7 @@ class LrcManager:
                     change_minute, change_second = self._parse_time(change_time)
                     change_minute += difference_minute
                     change_second += difference_second
-                    self._adjust_time(change_minute, change_second)
+                    change_minute, change_second = self._adjust_time(change_minute, change_second)
                     character_lst[time_index] = f"{change_minute}:{change_second}{change_time[9:]}"
                 lines[index] = "<".join(character_lst)
         self.write(lines)
@@ -73,17 +73,16 @@ class LrcManager:
         if second < 0:
             second += 60
             minute -= 1
-        if second >= 60:
+        elif second >= 60:
             second -= 60
             minute += 1
-
         if second < 10:
             second = f"0{second:.3f}"
         else:
             second = f"{second:.3f}"
-
         if minute < 10:
             minute = f"0{minute}"
+        return minute, second
 
     def reset(self):
         self.file_path = None
