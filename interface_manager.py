@@ -89,7 +89,6 @@ class InterfaceManager:
         self.lrc_text.tag_config("highlight", background="yellow", foreground="red")
         self.lrc_text.bind("<Button-1>", self.highlight_line)
 
-
     def update_progress(self):
         if self.play_button.cget("text") == "暂停":
             _, position = self.audio_player.get_position()
@@ -188,14 +187,26 @@ class InterfaceManager:
             msgbox.showerror("错误", "请先加载歌词文件")
 
     def reset(self):
+        self._reset_audio_player()
+        self._reset_lrc_manager()
+        self._reset_ui()
+        self._reset_progress_bar()
+
+    def _reset_audio_player(self):
         self.audio_player.reset()
+
+    def _reset_lrc_manager(self):
         self.lrc_manager.reset()
+
+    def _reset_ui(self):
         self.index = 0
         self.lines = 0
         self.length = 0
         self.audio_file_button.config(text="加载音频文件")
         self.lrc_file_button.config(text="加载歌词文件")
         self.play_button.config(text="播放")
+
+    def _reset_progress_bar(self):
         self.progress_bar.set(0)
 
     def highlight_line(self, _):
@@ -217,7 +228,7 @@ class InterfaceManager:
 
     def location(self, lines, start, end, direction):
         for line in lines[start:end:direction]:
-            condition = (direction + 1 and "]" in line) or (direction - 1 and not "]" in line)
+            condition = (direction == 1 and "]" in line) or (direction == -1 and not "]" in line)
             if condition:
                 self.index += direction
             else:
