@@ -149,13 +149,10 @@ class InterfaceManager:
 
     def undo(self):
         if self.lrc_file_button.cget("text") == "重新加载歌词文件":
-            if self.audio_file_button.cget("text") == "重新加载音频文件":
-                self.lrc_manager.undo(self.lrc_file_index)
-                self.update_lrc()
-                self.location(self.lrc_file_lines, self.lrc_file_index, 0, -1)
-                self.scroll_lrc_text()
-            else:
-                msgbox.showerror("错误", "请先加载音频文件")
+            self.lrc_manager.undo(self.lrc_file_index)
+            self.update_lrc()
+            self.location(self.lrc_file_lines, self.lrc_file_index, 0, -1)
+            self.scroll_lrc_text()
         else:
             msgbox.showerror("错误", "请先加载歌词文件")
 
@@ -175,14 +172,11 @@ class InterfaceManager:
 
     def change_timestamp(self):
         if self.lrc_file_button.cget("text") == "重新加载歌词文件":
-            if self.audio_file_button.cget("text") == "重新加载音频文件":
-                self.lrc_manager.change_timestamp()
-                msgbox.showinfo("提示", "修改成功")
-                self.update_lrc()
-                self.location(self.lrc_file_lines, 0, 0, 1)
-                self.scroll_lrc_text()
-            else:
-                msgbox.showerror("错误", "请先加载音频文件")
+            self.lrc_manager.change_timestamp()
+            msgbox.showinfo("提示", "修改成功")
+            self.update_lrc()
+            self.location(self.lrc_file_lines, 0, 0, 1)
+            self.scroll_lrc_text()
         else:
             msgbox.showerror("错误", "请先加载歌词文件")
 
