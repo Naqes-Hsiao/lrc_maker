@@ -87,7 +87,7 @@ class InterfaceManager:
 
     def _update_progress(self):
         if self.play_button.cget("text") == "暂停":
-            position = self.audio_player.get_position() / self.audio_player.get_file_length() * 100
+            position = self.audio_player.get_position()
             self.progress_bar.set(position)
             if self.audio_player.restart():
                 self.progress_bar.set(0)
@@ -155,7 +155,7 @@ class InterfaceManager:
     def timestamp(self):
         if self.load_lrc_button.cget("text") == "重新加载歌词文件":
             if self.load_audio_button.cget("text") == "重新加载音频文件":
-                current_time = self.audio_player.get_position()
+                current_time = self.audio_player.get_position() / 100 * self.audio_player.get_file_length()
                 self.lrc_manager.timestamp(self.lrc_manager.get_file_index(), current_time)
                 self._update_lrc()
                 self._location(self.lrc_manager.get_file_index(), self.lrc_manager.get_file_length() - 1, 1)

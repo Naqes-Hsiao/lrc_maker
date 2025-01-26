@@ -64,7 +64,8 @@ class AudioPlayer:
     def get_position(self):
         if self.__is_play:
             current_time = pg.mixer.music.get_pos() / 1000 + self.__difference
-            return current_time
+            position = current_time / self.__file_length * 100
+            return position
         else:
             return 0
 
