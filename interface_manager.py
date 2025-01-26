@@ -177,15 +177,8 @@ class InterfaceManager:
             msgbox.showerror("错误", "请先加载歌词文件")
 
     def reset(self):
-        self._reset_audio_player()
-        self._reset_lrc_manager()
         self._reset_ui()
-        self._reset_progress_bar()
-
-    def _reset_audio_player(self):
         self.audio_player.reset()
-
-    def _reset_lrc_manager(self):
         self.lrc_manager.reset()
 
     def _reset_ui(self):
@@ -197,7 +190,6 @@ class InterfaceManager:
         self.lrc_text.delete("1.0", tk.END)
         self.lrc_text.config(state=tk.DISABLED)
 
-    def _reset_progress_bar(self):
         self.progress_bar.set(0)
 
     def highlight_line(self, _):
