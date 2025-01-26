@@ -3,25 +3,37 @@ import tkinter.filedialog as tkfd
 
 class LrcManager:
     def __init__(self):
-        self.file_path = None
+        self.__file_path = None
+        self.__file_length = 0
+        self.__file_lines = []
+        self.__file_index = 0
+
+    def get_file_length(self):
+        return self.__file_length
+
+    def get_file_lines(self):
+        return self.__file_lines
+
+    def get_file_index(self):
+        return self.__file_index
 
     def load(self):
-        self.file_path = tkfd.askopenfilename(filetypes=[("歌词文件", "*.lrc")])
-        return self.file_path
+        self.__file_path = tkfd.askopenfilename(filetypes=[("歌词文件", "*.lrc")])
+        return self.__file_path
 
     def reload(self):
-        temp_file_path = self.file_path
-        self.file_path = tkfd.askopenfilename(filetypes=[("歌词文件", "*.lrc")])
-        if not self.file_path:
-            self.file_path = temp_file_path
+        temp_file_path = self.__file_path
+        self.__file_path = tkfd.askopenfilename(filetypes=[("歌词文件", "*.lrc")])
+        if not self.__file_path:
+            self.__file_path = temp_file_path
 
     def read(self):
-        with open(self.file_path, "r", encoding="utf-8") as file:
-            lines = file.readlines()
-            return lines, len(lines)
+        with open(self.__file_path, "r", encoding="utf-8") as file:
+            self.__file_lines = file.readlines()
+            self.__file_length = len(self.__file_lines)
 
     def write(self, lines):
-        with open(self.file_path, "w", encoding="utf-8") as file:
+        with open(self.__file_path, "w", encoding="utf-8") as file:
             file.writelines(lines)
 
     def undo(self, index):
@@ -85,4 +97,4 @@ class LrcManager:
         return minute, second
 
     def reset(self):
-        self.file_path = None
+        self.__file_path = None

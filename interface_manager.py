@@ -59,8 +59,8 @@ class InterfaceManager:
         self.load_audio_button = tk.Button(self.frame_audio, text="加载音频文件", command=self.load_audio)
         self.load_audio_button.grid(row=0, column=0, padx=10, pady=10)
 
-        self.play_audio_button = tk.Button(self.frame_audio, text="播放", command=self.play_audio)
-        self.play_audio_button.grid(row=0, column=1, padx=10, pady=10)
+        self.play_button = tk.Button(self.frame_audio, text="播放", command=self.play)
+        self.play_button.grid(row=0, column=1, padx=10, pady=10)
 
     def _create_lrc_buttons(self):
         self.frame_lrc = tk.Frame(self.frame_right)
@@ -90,19 +90,19 @@ class InterfaceManager:
         self.lrc_text.bind("<Button-1>", self.highlight_line)
 
     def update_progress(self):
-        if self.play_audio_button.cget("text") == "暂停":
+        if self.play_button.cget("text") == "暂停":
             _, position = self.audio_player.get_position()
             self.progress_bar.set(position)
             if self.audio_player.restart():
                 self.progress_bar.set(0)
-                self.play_audio_button.config(text="播放")
+                self.play_button.config(text="播放")
         self.progress_bar.after(1000, self.update_progress)
 
     def start_drag(self, _):
         if self.load_audio_button.cget("text") == "重新加载音频文件":
-            if self.play_audio_button.cget("text") == "暂停":
+            if self.play_button.cget("text") == "暂停":
                 self.audio_player.pause()
-                self.play_audio_button.config(text="播放")
+                self.play_button.config(text="播放")
 
     def drag_progress(self, _):
         if self.load_audio_button.cget("text") == "重新加载音频文件":
@@ -111,7 +111,7 @@ class InterfaceManager:
     def end_drag(self, _):
         if self.load_audio_button.cget("text") == "重新加载音频文件":
             self.audio_player.play()
-            self.play_audio_button.config(text="暂停")
+            self.play_button.config(text="暂停")
         else:
             msgbox.showerror("错误", "请先加载音频文件")
             self.progress_bar.set(0)
@@ -123,14 +123,14 @@ class InterfaceManager:
         else:
             self.audio_player.reload()
 
-    def play_audio(self):
+    def play(self):
         if self.load_audio_button.cget("text") == "重新加载音频文件":
-            if self.play_audio_button.cget("text") == "播放":
+            if self.play_button.cget("text") == "播放":
                 self.audio_player.play()
-                self.play_audio_button.config(text="暂停")
+                self.play_button.config(text="暂停")
             else:
                 self.audio_player.pause()
-                self.play_audio_button.config(text="播放")
+                self.play_button.config(text="播放")
         else:
             msgbox.showerror("错误", "请先加载音频文件")
 
@@ -138,21 +138,21 @@ class InterfaceManager:
         if self.load_lrc_button.cget("text") == "加载歌词文件":
             if self.lrc_manager.load():
                 self.load_lrc_button.config(text="重新加载歌词文件")
-                self.update_lrc()
-                self.location(self.lrc_file_lines, 0, self.lrc_file_length - 1, 1)
-                self.scroll_lrc_text()
+                self._update_lrc()
+                self._location(self.lrc_file_lines, 0, self.lrc_file_length - 1, 1)
+                self._scroll_lrc_text()
         else:
             self.lrc_manager.reload()
-            self.update_lrc()
-            self.location(self.lrc_file_lines, 0, self.lrc_file_length - 1, 1)
-            self.scroll_lrc_text()
+            self._update_lrc()
+            self._location(self.lrc_file_lines, 0, self.lrc_file_length - 1, 1)
+            self._scroll_lrc_text()
 
     def undo(self):
         if self.load_lrc_button.cget("text") == "重新加载歌词文件":
             self.lrc_manager.undo(self.lrc_file_index)
-            self.update_lrc()
-            self.location(self.lrc_file_lines, self.lrc_file_index, 0, -1)
-            self.scroll_lrc_text()
+            self._update_lrc()
+            self._location(self.lrc_file_lines, self.lrc_file_index, 0, -1)
+            self._scroll_lrc_text()
         else:
             msgbox.showerror("错误", "请先加载歌词文件")
 
@@ -161,10 +161,10 @@ class InterfaceManager:
             if self.load_audio_button.cget("text") == "重新加载音频文件":
                 current_time, _ = self.audio_player.get_position()
                 self.lrc_manager.timestamp(self.lrc_file_index, current_time)
-                self.update_lrc()
-                self.location(self.lrc_file_lines, self.lrc_file_index, self.lrc_file_length - 1, 1)
+                self._update_lrc()
+                self._location(self.lrc_file_lines, self.lrc_file_index, self.lrc_file_length - 1, 1)
                 if self.lrc_file_index > 5:
-                    self.scroll_lrc_text()
+                    self._scroll_lrc_text()
             else:
                 msgbox.showerror("错误", "请先加载音频文件")
         else:
@@ -174,9 +174,9 @@ class InterfaceManager:
         if self.load_lrc_button.cget("text") == "重新加载歌词文件":
             self.lrc_manager.change_timestamp()
             msgbox.showinfo("提示", "修改成功")
-            self.update_lrc()
-            self.location(self.lrc_file_lines, 0, 0, 1)
-            self.scroll_lrc_text()
+            self._update_lrc()
+            self._location(self.lrc_file_lines, 0, 0, 1)
+            self._scroll_lrc_text()
         else:
             msgbox.showerror("错误", "请先加载歌词文件")
 
@@ -198,7 +198,7 @@ class InterfaceManager:
     def _reset_ui(self):
         self.load_audio_button.config(text="加载音频文件")
         self.load_lrc_button.config(text="加载歌词文件")
-        self.play_audio_button.config(text="播放")
+        self.play_button.config(text="播放")
 
         self.lrc_text.config(state=tk.NORMAL)
         self.lrc_text.delete("1.0", tk.END)
@@ -216,15 +216,15 @@ class InterfaceManager:
             self.lrc_text.tag_add("highlight", start_index, end_index)
             self.lrc_file_index = (line_number - 1) >> 1
 
-    def update_lrc(self):
+    def _update_lrc(self):
         self.lrc_text.config(state=tk.NORMAL)
         self.lrc_text.delete("1.0", tk.END)
-        self.lrc_file_lines, self.lrc_file_length = self.lrc_manager.read()
-        for line in self.lrc_file_lines:
+        self.lrc_manager.read()
+        for line in self.lrc_manager.get_file_lines():
             self.lrc_text.insert(tk.END, line + "\n")
         self.lrc_text.config(state=tk.DISABLED)
 
-    def location(self, lines, start, end, direction):
+    def _location(self, lines, start, end, direction):
         for line in lines[start:end:direction]:
             condition = (direction == 1 and "]" in line) or (direction == -1 and not "]" in line)
             if condition:
@@ -235,6 +235,6 @@ class InterfaceManager:
         end_index = f"{(self.lrc_file_index << 1) + 1}.end"
         self.lrc_text.tag_add("highlight", start_index, end_index)
 
-    def scroll_lrc_text(self):
+    def _scroll_lrc_text(self):
         scroll_distance = (self.lrc_file_index - 5) * 3
         self.lrc_text.yview_scroll(scroll_distance, "units")
