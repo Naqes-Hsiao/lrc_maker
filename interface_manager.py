@@ -218,7 +218,7 @@ class InterfaceManager:
         self.lrc_text.config(state=tk.DISABLED)
 
     def _location(self, start, end, direction):
-        for line in self.lrc_manager.get_file_lines[start:end:direction]:
+        for line in self.lrc_manager.get_file_lines()[start:end:direction]:
             condition_timestamp = direction == 1 and "]" in line
             condition_undo = direction == -1 and not "]" in line
             if condition_timestamp or condition_undo:
