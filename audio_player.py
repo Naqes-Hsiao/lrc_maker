@@ -31,6 +31,7 @@ class AudioPlayer:
             self.pause()
             self.__stream.close()
             self.__audio = AudioSegment.from_file(self.__file_path)
+            self.__index = 0
 
     def _play(self):
         self.__audio = self.__audio.set_sample_width(2)
