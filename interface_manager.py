@@ -117,6 +117,8 @@ class InterfaceManager:
             if self.audio_player.load():
                 self.load_audio_button.config(text="重新加载音频文件")
         else:
+            self.audio_player.pause()
+            self.play_button.config(text="播放")
             self.audio_player.reload()
 
     def play(self):
