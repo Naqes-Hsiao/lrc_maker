@@ -14,7 +14,7 @@ class InterfaceManager:
         self.lrc_manager = LrcManager()
 
         self.create_widgets()
-        # self._update_progress()
+        self._update_progress()
 
     def create_widgets(self):
         self._configure_layout()
@@ -85,14 +85,14 @@ class InterfaceManager:
         self.lrc_text.tag_config("highlight", background="yellow", foreground="red")
         self.lrc_text.bind("<Button-1>", self.highlight_line)
 
-    # def _update_progress(self):
-    #     if self.play_button.cget("text") == "暂停":
-    #         position = self.audio_player.get_position()
-    #         self.progress_bar.set(position)
+    def _update_progress(self):
+        if self.play_button.cget("text") == "暂停":
+            position = self.audio_player.get_position()
+            self.progress_bar.set(position)
     #         if self.audio_player.restart():
     #             self.progress_bar.set(0)
     #             self.play_button.config(text="播放")
-    #     self.progress_bar.after(1000, self._update_progress)
+        self.progress_bar.after(1000, self._update_progress)
 
     def start_drag(self, _):
         if self.load_audio_button.cget("text") == "重新加载音频文件":
