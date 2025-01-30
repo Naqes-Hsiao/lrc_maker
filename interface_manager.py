@@ -89,9 +89,9 @@ class InterfaceManager:
         if self.play_button.cget("text") == "暂停":
             position = self.audio_player.get_position()
             self.progress_bar.set(position)
-    #         if self.audio_player.restart():
-    #             self.progress_bar.set(0)
-    #             self.play_button.config(text="播放")
+            if self.audio_player.restart():
+                self.progress_bar.set(0)
+                self.play_button.config(text="播放")
         self.progress_bar.after(1000, self._update_progress)
 
     def start_drag(self, _):
