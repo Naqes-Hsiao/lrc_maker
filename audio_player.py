@@ -18,6 +18,9 @@ class AudioPlayer:
 
         self.__p = pyaudio.PyAudio()
 
+    def get_file_length(self):
+        return self.__audio.duration_seconds
+
     def load(self):
         self.__file_path = askopenfilename(filetypes=[("音频文件", "*.flac;*.mp3")])
         if self.__file_path:
