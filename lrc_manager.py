@@ -1,4 +1,4 @@
-import tkinter.filedialog as tkfd
+from tkinter.filedialog import askopenfilename
 
 
 class LrcManager:
@@ -21,12 +21,12 @@ class LrcManager:
         self.__file_index = index
 
     def load(self):
-        self.__file_path = tkfd.askopenfilename(filetypes=[("歌词文件", "*.lrc")])
+        self.__file_path = askopenfilename(filetypes=[("歌词文件", "*.lrc")])
         return self.__file_path
 
     def reload(self):
         temp_file_path = self.__file_path
-        self.__file_path = tkfd.askopenfilename(filetypes=[("歌词文件", "*.lrc")])
+        self.__file_path = askopenfilename(filetypes=[("歌词文件", "*.lrc")])
         if not self.__file_path:
             self.__file_path = temp_file_path
 
