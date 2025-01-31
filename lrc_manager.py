@@ -58,13 +58,8 @@ class LrcManager:
             if "]" in lrc_str and "<" in lrc_str:
                 # 将当前行按"<"分割，得到目标时间和转换时间
                 character_lst = lrc_str.split("<")
-                target_time, change_time = character_lst[0], character_lst[1]
-                # 解析目标时间和转换时间，得到分钟和秒
-                target_minute, target_second, _ = self._split_str(target_time)
-                change_minute, change_second, _ = self._split_str(change_time)
                 # 计算目标时间和转换时间的时间差
-                difference_minute = target_minute - change_minute
-                difference_second = target_second - change_second
+                difference_minute, difference_second = self._calculate_difference(character_lst)
                 # 遍历分割后的时间列表，进行时间戳转换
                 for time_index in range(1, len(character_lst)):
                     # 获取当前时间
@@ -80,6 +75,13 @@ class LrcManager:
                     character_lst[time_index] = f"{change_minute}:{change_second}{lrc_str}"
                 self.__file_lines[index] = "<".join(character_lst)
         self._write(self.__file_lines)
+
+    def _calculate_difference(self, character_lst):
+        target_time, change_time = character_lst[0], character_lst[1]
+        # 解析目标时间和转换时间，得到分钟和秒
+        target_minute, target_second, _ = self._split_str(target_time)
+        change_minute, change_second, _ = self._split_str(change_time)
+        return target_minute - change_minute, target_second - change_second
 
     def _split_str(self, time_str):
         pattern = re.compile(r"\[?0(\d):(\d{2}\.\d+)(.*\n?)")
