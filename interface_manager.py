@@ -113,13 +113,11 @@ class InterfaceManager:
             self.progress_bar.set(0)
 
     def load_audio(self):
-        if self.load_audio_button.cget("text") == "加载音频文件":
-            if self.audio_player.load():
-                self.load_audio_button.config(text="重新加载音频文件")
-        else:
-            self.audio_player.pause()
+        self.audio_player.pause()
+        if self.audio_player.load():
+            self.load_audio_button.config(text="重新加载音频文件")
             self.play_button.config(text="播放")
-            self.audio_player.reload()
+            self.progress_bar.set(0)
 
     def play(self):
         if self.load_audio_button.cget("text") == "重新加载音频文件":
@@ -133,14 +131,8 @@ class InterfaceManager:
             msgbox.showerror("错误", "请先加载音频文件")
 
     def load_lrc(self):
-        if self.load_lrc_button.cget("text") == "加载歌词文件":
-            if self.lrc_manager.load():
-                self.load_lrc_button.config(text="重新加载歌词文件")
-                self._update_lrc()
-                self._location(0, self.lrc_manager.get_file_length() - 1, 1)
-                self._scroll_lrc_text()
-        else:
-            self.lrc_manager.reload()
+        if self.lrc_manager.load():
+            self.load_lrc_button.config(text="重新加载歌词文件")
             self._update_lrc()
             self._location(0, self.lrc_manager.get_file_length() - 1, 1)
             self._scroll_lrc_text()

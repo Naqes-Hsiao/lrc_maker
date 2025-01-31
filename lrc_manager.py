@@ -24,12 +24,6 @@ class LrcManager:
         self.__file_path = askopenfilename(filetypes=[("歌词文件", "*.lrc")])
         return self.__file_path
 
-    def reload(self):
-        temp_file_path = self.__file_path
-        self.__file_path = askopenfilename(filetypes=[("歌词文件", "*.lrc")])
-        if not self.__file_path:
-            self.__file_path = temp_file_path
-
     def read(self):
         with open(self.__file_path, "r", encoding="utf-8") as file:
             self.__file_lines = file.readlines()

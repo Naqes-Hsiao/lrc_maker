@@ -13,8 +13,8 @@ class AudioPlayer:
         self.__stream = None
         self.__is_play = False
         self.__is_pause = True
-        self.__index = 0
         self.__sample = None
+        self.__is_load = False
 
         self.__p = pyaudio.PyAudio()
 
@@ -24,20 +24,15 @@ class AudioPlayer:
     def load(self):
         self.__file_path = askopenfilename(filetypes=[("音频文件", "*.flac;*.mp3")])
         if self.__file_path:
-            self.__audio = AudioSegment.from_file(self.__file_path)
-            self.__audio = self.__audio.set_sample_width(2)
-            self.__sample = np.array(self.__audio.get_array_of_samples()).reshape(-1, 2)
-        return self.__file_path
-
-    def reload(self):
-        self.__file_path = askopenfilename(filetypes=[("音频文件", "*.flac;*.mp3")])
-        if self.__file_path:
-            self.pause()
-            self.__stream.close()
-            self.__audio = AudioSegment.from_file(self.__file_path)
-            self.__audio = self.__audio.set_sample_width(2)
-            self.__sample = np.array(self.__audio.get_array_of_samples()).reshape(-1, 2)
+            if self.__is_load:
+                self.pause()
+                self.__stream.close()
             self.__index = 0
+            self.__audio = AudioSegment.from_file(self.__file_path)
+            self.__audio = self.__audio.set_sample_width(2)
+            self.__sample = np.array(self.__audio.get_array_of_samples()).reshape(-1, 2)
+            self.__is_load = True
+        return self.__file_path
 
     def _play(self):
         self.__stream = self.__p.open(
