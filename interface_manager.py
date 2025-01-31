@@ -134,8 +134,8 @@ class InterfaceManager:
         if self.lrc_manager.load():
             self.load_lrc_button.config(text="重新加载歌词文件")
             self._update_lrc()
-            self._location(0, self.lrc_manager.get_file_length() - 1, 1)
-            self._scroll_lrc_text()
+        self._location(self.lrc_manager.get_file_index(), self.lrc_manager.get_file_length() - 1, 1)
+        self._scroll_lrc_text()
 
     def undo(self):
         if self.load_lrc_button.cget("text") == "重新加载歌词文件":
@@ -198,7 +198,6 @@ class InterfaceManager:
     def _update_lrc(self):
         self.lrc_text.config(state=tk.NORMAL)
         self.lrc_text.delete("1.0", tk.END)
-        self.lrc_manager.read()
         for line in self.lrc_manager.get_file_lines():
             self.lrc_text.insert(tk.END, line + "\n")
         self.lrc_text.config(state=tk.DISABLED)

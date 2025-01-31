@@ -63,6 +63,7 @@ class AudioPlayer:
         self.__index = int(position / 100 * len(self.__sample))
 
     def restart(self):
+        # 当播放结束时，并未按下暂停键，而是直接点击播放键时，需要重置播放状态
         is_over = not self.__is_play and not self.__is_pause
         if is_over:
             self.pause()

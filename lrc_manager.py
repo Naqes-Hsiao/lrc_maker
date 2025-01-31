@@ -1,4 +1,5 @@
 from tkinter.filedialog import askopenfilename
+import re
 
 
 class LrcManager:
@@ -21,56 +22,69 @@ class LrcManager:
         self.__file_index = index
 
     def load(self):
+        temp_file_path = self.__file_path
         self.__file_path = askopenfilename(filetypes=[("歌词文件", "*.lrc")])
+        if self.__file_path:
+            self._read()
+        else:
+            self.__file_path = temp_file_path
         return self.__file_path
 
-    def read(self):
+    def _read(self):
         with open(self.__file_path, "r", encoding="utf-8") as file:
             self.__file_lines = file.readlines()
             self.__file_length = len(self.__file_lines)
 
-    def write(self, lines):
+    def _write(self, lines):
         with open(self.__file_path, "w", encoding="utf-8") as file:
             file.writelines(lines)
 
     def undo(self, index):
         if "]" in self.__file_lines[index]:
             self.__file_lines[index] = self.__file_lines[index].split("]")[1]
-        self.write(self.__file_lines)
+        self._write(self.__file_lines)
 
     def timestamp(self, index, time):
         if "]" not in self.__file_lines[index]:
             minute, second = self._adjust_time(time)
             self.__file_lines[index] = f"[{minute}:{second}]{self.__file_lines[index]}"
-            self.write(self.__file_lines)
+            self._write(self.__file_lines)
 
     def change_timestamp(self):
+        # 遍历歌词文件行数，并获取当前行
         for index in range(self.__file_length):
-            lrc = self.__file_lines[index]
-            if "]" in lrc and "<" in lrc:
-                character_lst = lrc.split("<")
+            lrc_str = self.__file_lines[index]
+            # 判断歌词格式是否匹配，如果当前行包含"]"和"<"，则进行时间戳转换
+            if "]" in lrc_str and "<" in lrc_str:
+                # 将当前行按"<"分割，得到目标时间和转换时间
+                character_lst = lrc_str.split("<")
                 target_time, change_time = character_lst[0], character_lst[1]
-                target_minute, target_second = self._parse_time(target_time)
-                change_minute, change_second = self._parse_time(change_time)
-                difference_minute, difference_second = self._calculate_time_difference(target_minute, target_second, change_minute, change_second)
+                # 解析目标时间和转换时间，得到分钟和秒
+                target_minute, target_second, _ = self._split_str(target_time)
+                change_minute, change_second, _ = self._split_str(change_time)
+                # 计算目标时间和转换时间的时间差
+                difference_minute = target_minute - change_minute
+                difference_second = target_second - change_second
+                # 遍历分割后的时间列表，进行时间戳转换
                 for time_index in range(1, len(character_lst)):
+                    # 获取当前时间
                     change_time = character_lst[time_index]
-                    change_minute, change_second = self._parse_time(change_time)
+                    # 解析当前时间，得到分钟、 秒和歌词
+                    change_minute, change_second, lrc_str = self._split_str(change_time)
+                    # 将时间差加到当前时间上
                     change_minute += difference_minute
                     change_second += difference_second
+                    # 调整时间，确保分钟和秒在合理范围内
                     change_minute, change_second = self._adjust_time(change_minute * 60 + change_second)
-                    character_lst[time_index] = f"{change_minute}:{change_second}{change_time[9:]}"
+                    # 将转换后的时间重新拼接
+                    character_lst[time_index] = f"{change_minute}:{change_second}{lrc_str}"
                 self.__file_lines[index] = "<".join(character_lst)
-        self.write(self.__file_lines)
+        self._write(self.__file_lines)
 
-    def _parse_time(self, time_str):
-        minute, second = time_str.split(":")
-        return int(minute[1:]), float(second[:6])
-
-    def _calculate_time_difference(self, target_minute, target_second, change_minute, change_second):
-        difference_minute = target_minute - change_minute
-        difference_second = target_second - change_second
-        return difference_minute, difference_second
+    def _split_str(self, time_str):
+        pattern = re.compile(r"\[?0(\d):(\d{2}\.\d+)(.*\n?)")
+        match = pattern.match(time_str)
+        return int(match.group(1)), float(match.group(2)), match.group(3)
 
     def _adjust_time(self, time):
         minute, second = divmod(time, 60)
