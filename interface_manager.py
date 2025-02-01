@@ -134,8 +134,8 @@ class InterfaceManager:
         if self.lrc_manager.load():
             self.load_lrc_button.config(text="重新加载歌词文件")
             self._update_lrc()
-        self._location(self.lrc_manager.get_file_index(), self.lrc_manager.get_file_length() - 1, 1)
-        self._scroll_lrc_text()
+            self._location(self.lrc_manager.get_file_index(), self.lrc_manager.get_file_length() - 1, 1)
+            self._scroll_lrc_text()
 
     def undo(self):
         if self.load_lrc_button.cget("text") == "重新加载歌词文件":
