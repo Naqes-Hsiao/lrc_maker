@@ -5,8 +5,8 @@ import re
 class LrcManager:
     def __init__(self):
         self.__file_path = None
-        self.__file_length = 0
         self.__file_lines = None
+        self.__file_length = 0
         self.__file_index = 0
 
     def get_file_length(self):
@@ -25,30 +25,26 @@ class LrcManager:
         temp_file_path = self.__file_path
         self.__file_path = askopenfilename(filetypes=[("歌词文件", "*.lrc")])
         if self.__file_path:
-            self._read()
+            with open(self.__file_path, "r", encoding="utf-8") as file:
+                self.__file_lines = file.readlines()
+                self.__file_length = len(self.__file_lines)
         else:
             self.__file_path = temp_file_path
         return self.__file_path
 
-    def _read(self):
-        with open(self.__file_path, "r", encoding="utf-8") as file:
-            self.__file_lines = file.readlines()
-            self.__file_length = len(self.__file_lines)
-
-    def _write(self, lines):
-        with open(self.__file_path, "w", encoding="utf-8") as file:
-            file.writelines(lines)
+    def save(self):
+        if self.__file_path:
+            with open(self.__file_path, "w", encoding="utf-8") as file:
+                file.writelines(self.__file_lines)
 
     def undo(self, index):
         if "]" in self.__file_lines[index]:
             self.__file_lines[index] = self.__file_lines[index].split("]")[1]
-        self._write(self.__file_lines)
 
     def timestamp(self, index, time):
         if "]" not in self.__file_lines[index]:
             minute, second = self._adjust_time(time)
             self.__file_lines[index] = f"[{minute}:{second}]{self.__file_lines[index]}"
-            self._write(self.__file_lines)
 
     def change_timestamp(self):
         # 遍历歌词文件行数，并获取当前行
@@ -64,7 +60,6 @@ class LrcManager:
                 self._change_timstamp(character_lst, difference_minute, difference_second)
                 # 将调整后的时间戳重新拼接
                 self.__file_lines[index] = "<".join(character_lst)
-        self._write(self.__file_lines)
 
     def _change_timstamp(self, character_lst, difference_minute, difference_second):
         for time_index in range(1, len(character_lst)):
@@ -102,6 +97,4 @@ class LrcManager:
 
     def reset(self):
         self.__file_path = None
-        self.__file_length = 0
-        self.__file_lines = None
         self.__file_index = 0

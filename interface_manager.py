@@ -52,31 +52,37 @@ class InterfaceManager:
         self.frame_audio = tk.Frame(self.frame_right)
         self.frame_audio.pack()
 
-        self.load_audio_button = tk.Button(self.frame_audio, text="加载音频文件", command=self.load_audio)
-        self.load_audio_button.grid(row=0, column=0, padx=10, pady=10)
+        self.load_audio_btn = tk.Button(self.frame_audio, text="加载音频文件", command=self.load_audio)
+        self.load_audio_btn.grid(row=0, column=0, padx=10, pady=10)
 
-        self.play_button = tk.Button(self.frame_audio, text="播放", command=self.play)
-        self.play_button.grid(row=0, column=1, padx=10, pady=10)
+        self.play_btn = tk.Button(self.frame_audio, text="播放", command=self.toggle_play)
+        self.play_btn.grid(row=0, column=1, padx=10, pady=10)
 
     def _create_lrc_buttons(self):
         self.frame_lrc = tk.Frame(self.frame_right)
         self.frame_lrc.pack(side=tk.TOP)
 
-        self.load_lrc_button = tk.Button(self.frame_lrc, text="加载歌词文件", command=self.load_lrc)
-        self.load_lrc_button.grid(row=0, column=0, padx=10, pady=10)
+        self.load_lrc_btn = tk.Button(self.frame_lrc, text="加载歌词文件", command=self.load_lrc)
+        self.load_lrc_btn.grid(row=0, column=0, padx=10, pady=10)
 
-        self.undo_button = tk.Button(self.frame_lrc, text="撤销", command=self.undo)
-        self.undo_button.grid(row=0, column=1, padx=10, pady=10)
+        self.undo_btn = tk.Button(self.frame_lrc, text="撤销", command=self.undo)
+        self.undo_btn.grid(row=0, column=1, padx=10, pady=10)
 
-        self.timestamp_button = tk.Button(self.frame_lrc, text="打轴", command=self.timestamp)
-        self.timestamp_button.grid(row=0, column=2, padx=10, pady=10)
+        self.timestamp_btn = tk.Button(self.frame_lrc, text="打轴", command=self.timestamp)
+        self.timestamp_btn.grid(row=0, column=2, padx=10, pady=10)
 
     def _create_additional_buttons(self):
-        self.change_timestamp_button = tk.Button(self.frame_right, text="逐字调整", command=self.change_timestamp)
-        self.change_timestamp_button.pack(pady=10)
+        self.change_timestamp_btn = tk.Button(self.frame_right, text="逐字调整", command=self.change_timestamp)
+        self.change_timestamp_btn.pack(pady=10)
 
-        self.reset_button = tk.Button(self.frame_right, text="重置", command=self.reset)
-        self.reset_button.pack(pady=10)
+        self.frame_bottom = tk.Frame(self.frame_right)
+        self.frame_bottom.pack(side=tk.TOP)
+
+        self.reset_btn = tk.Button(self.frame_bottom, text="重置", command=self.reset)
+        self.reset_btn.grid(row=0, column=0, padx=10, pady=10)
+
+        self.save_btn = tk.Button(self.frame_bottom, text="保存", command=self.save)
+        self.save_btn.grid(row=0, column=1, padx=10, pady=10)
 
     def _create_lrc_text(self):
         self.lrc_text = tk.Text(self.frame_left, width=100, height=50, font=("宋体", 12))
@@ -86,28 +92,28 @@ class InterfaceManager:
         self.lrc_text.bind("<Button-1>", self.highlight_line)
 
     def _update_progress(self):
-        if self.play_button.cget("text") == "暂停":
+        if self.play_btn.cget("text") == "暂停":
             position = self.audio_player.get_position()
             self.progress_bar.set(position)
             if self.audio_player.restart():
                 self.progress_bar.set(0)
-                self.play_button.config(text="播放")
+                self.play_btn.config(text="播放")
         self.progress_bar.after(1000, self._update_progress)
 
     def start_drag(self, _):
-        if self.load_audio_button.cget("text") == "重新加载音频文件":
-            if self.play_button.cget("text") == "暂停":
+        if self.load_audio_btn.cget("text") == "重新加载音频文件":
+            if self.play_btn.cget("text") == "暂停":
                 self.audio_player.pause()
-                self.play_button.config(text="播放")
+                self.play_btn.config(text="播放")
 
     def drag_progress(self, _):
-        if self.load_audio_button.cget("text") == "重新加载音频文件":
+        if self.load_audio_btn.cget("text") == "重新加载音频文件":
             self.audio_player.set_position(self.progress_bar.get())
 
     def end_drag(self, _):
-        if self.load_audio_button.cget("text") == "重新加载音频文件":
+        if self.load_audio_btn.cget("text") == "重新加载音频文件":
             self.audio_player.play()
-            self.play_button.config(text="暂停")
+            self.play_btn.config(text="暂停")
         else:
             msgbox.showerror("错误", "请先加载音频文件")
             self.progress_bar.set(0)
@@ -115,30 +121,30 @@ class InterfaceManager:
     def load_audio(self):
         self.audio_player.pause()
         if self.audio_player.load():
-            self.load_audio_button.config(text="重新加载音频文件")
-            self.play_button.config(text="播放")
+            self.load_audio_btn.config(text="重新加载音频文件")
+            self.play_btn.config(text="播放")
             self.progress_bar.set(0)
 
-    def play(self):
-        if self.load_audio_button.cget("text") == "重新加载音频文件":
-            if self.play_button.cget("text") == "播放":
+    def toggle_play(self):
+        if self.load_audio_btn.cget("text") == "重新加载音频文件":
+            if self.play_btn.cget("text") == "播放":
                 self.audio_player.play()
-                self.play_button.config(text="暂停")
+                self.play_btn.config(text="暂停")
             else:
                 self.audio_player.pause()
-                self.play_button.config(text="播放")
+                self.play_btn.config(text="播放")
         else:
             msgbox.showerror("错误", "请先加载音频文件")
 
     def load_lrc(self):
         if self.lrc_manager.load():
-            self.load_lrc_button.config(text="重新加载歌词文件")
+            self.load_lrc_btn.config(text="重新加载歌词文件")
             self._update_lrc()
             self._location(self.lrc_manager.get_file_index(), self.lrc_manager.get_file_length() - 1, 1)
             self._scroll_lrc_text()
 
     def undo(self):
-        if self.load_lrc_button.cget("text") == "重新加载歌词文件":
+        if self.load_lrc_btn.cget("text") == "重新加载歌词文件":
             self.lrc_manager.undo(self.lrc_manager.get_file_index())
             self._update_lrc()
             self._location(self.lrc_manager.get_file_index(), 0, -1)
@@ -147,8 +153,8 @@ class InterfaceManager:
             msgbox.showerror("错误", "请先加载歌词文件")
 
     def timestamp(self):
-        if self.load_lrc_button.cget("text") == "重新加载歌词文件":
-            if self.load_audio_button.cget("text") == "重新加载音频文件":
+        if self.load_lrc_btn.cget("text") == "重新加载歌词文件":
+            if self.load_audio_btn.cget("text") == "重新加载音频文件":
                 current_time = self.audio_player.get_position() / 100 * self.audio_player.get_file_length()
                 self.lrc_manager.timestamp(self.lrc_manager.get_file_index(), current_time)
                 self._update_lrc()
@@ -161,7 +167,7 @@ class InterfaceManager:
             msgbox.showerror("错误", "请先加载歌词文件")
 
     def change_timestamp(self):
-        if self.load_lrc_button.cget("text") == "重新加载歌词文件":
+        if self.load_lrc_btn.cget("text") == "重新加载歌词文件":
             self.lrc_manager.change_timestamp()
             msgbox.showinfo("提示", "修改成功")
             self._update_lrc()
@@ -175,10 +181,13 @@ class InterfaceManager:
         self.audio_player.reset()
         self.lrc_manager.reset()
 
+    def save(self):
+        self.lrc_manager.save()
+
     def _reset_ui(self):
-        self.load_audio_button.config(text="加载音频文件")
-        self.load_lrc_button.config(text="加载歌词文件")
-        self.play_button.config(text="播放")
+        self.load_audio_btn.config(text="加载音频文件")
+        self.load_lrc_btn.config(text="加载歌词文件")
+        self.play_btn.config(text="播放")
 
         self.lrc_text.config(state=tk.NORMAL)
         self.lrc_text.delete("1.0", tk.END)
