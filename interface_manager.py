@@ -72,17 +72,20 @@ class InterfaceManager:
         self.timestamp_btn.grid(row=0, column=2, padx=10, pady=10)
 
     def _create_additional_buttons(self):
-        self.change_timestamp_btn = tk.Button(self.frame_right, text="逐字调整", command=self.change_timestamp)
-        self.change_timestamp_btn.pack(pady=10)
-
         self.frame_bottom = tk.Frame(self.frame_right)
         self.frame_bottom.pack(side=tk.TOP)
 
-        self.reset_btn = tk.Button(self.frame_bottom, text="重置", command=self.reset)
-        self.reset_btn.grid(row=0, column=0, padx=10, pady=10)
+        self.change_timestamp_btn = tk.Button(self.frame_bottom, text="逐字调整", command=self.change_timestamp)
+        self.change_timestamp_btn.grid(row=0, column=0, padx=10, pady=10)
+
+        self.reset_lrc_btn = tk.Button(self.frame_bottom, text="重置歌词", command=self.reset_lrc)
+        self.reset_lrc_btn.grid(row=0, column=1, padx=10, pady=10)
 
         self.save_btn = tk.Button(self.frame_bottom, text="保存", command=self.save)
-        self.save_btn.grid(row=0, column=1, padx=10, pady=10)
+        self.save_btn.grid(row=0, column=2, padx=10, pady=10)
+
+        self.reset_btn = tk.Button(self.frame_right, text="重置", command=self.reset)
+        self.reset_btn.pack(pady=10)
 
     def _create_lrc_text(self):
         self.lrc_text = tk.Text(self.frame_left, width=100, height=50, font=("宋体", 12))
@@ -176,13 +179,27 @@ class InterfaceManager:
         else:
             msgbox.showerror("错误", "请先加载歌词文件")
 
+    def reset_lrc(self):
+        if self.load_lrc_btn.cget("text") == "重新加载歌词文件":
+            self.lrc_manager.reset_lrc()
+            self._update_lrc()
+            self._location(0, 0, 1)
+            self._scroll_lrc_text()
+        else:
+            msgbox.showerror("错误", "请先加载歌词文件")
+
+    def save(self):
+        if self.load_lrc_btn.cget("text") == "重新加载歌词文件":
+            self.lrc_manager.save()
+            msgbox.showinfo("提示", "保存成功")
+        else:
+            msgbox.showerror("错误", "请先加载歌词文件")
+
     def reset(self):
         self._reset_ui()
         self.audio_player.reset()
         self.lrc_manager.reset()
-
-    def save(self):
-        self.lrc_manager.save()
+        msgbox.showinfo("提示", "重置成功")
 
     def _reset_ui(self):
         self.load_audio_btn.config(text="加载音频文件")

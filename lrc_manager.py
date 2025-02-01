@@ -25,17 +25,13 @@ class LrcManager:
         temp_file_path = self.__file_path
         self.__file_path = askopenfilename(filetypes=[("歌词文件", "*.lrc")])
         if self.__file_path:
+            self.__file_index = 0
             with open(self.__file_path, "r", encoding="utf-8") as file:
                 self.__file_lines = file.readlines()
                 self.__file_length = len(self.__file_lines)
         else:
             self.__file_path = temp_file_path
         return self.__file_path
-
-    def save(self):
-        if self.__file_path:
-            with open(self.__file_path, "w", encoding="utf-8") as file:
-                file.writelines(self.__file_lines)
 
     def undo(self, index):
         if "]" in self.__file_lines[index]:
@@ -94,6 +90,17 @@ class LrcManager:
             second = f"{second:.3f}"
         minute = f"0{int(minute)}"
         return minute, second
+
+    def reset_lrc(self):
+        for index in range(self.__file_length):
+            if "]" in self.__file_lines[index]:
+                self.__file_lines[index] = self.__file_lines[index].split("]")[1]
+        self.__file_index = 0
+
+    def save(self):
+        if self.__file_path:
+            with open(self.__file_path, "w", encoding="utf-8") as file:
+                file.writelines(self.__file_lines)
 
     def reset(self):
         self.__file_path = None
