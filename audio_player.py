@@ -7,13 +7,12 @@ import numpy as np
 
 class AudioPlayer:
     def __init__(self):
-        self.__thread = None
         self.__sample = None
         self.__stream = None
         self.__index = 0
+        self.__file_length = 0
         self.__is_play = False
         self.__is_pause = True
-        self.__file_length = 0
 
         self.__p = pyaudio.PyAudio()
 
@@ -47,8 +46,8 @@ class AudioPlayer:
     def play(self):
         self.__is_play = True
         self.__is_pause = False
-        self.__thread = Thread(target=self._play, daemon=True)
-        self.__thread.start()
+        thread = Thread(target=self._play, daemon=True)
+        thread.start()
 
     def pause(self):
         self.__is_play = False
