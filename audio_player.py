@@ -10,13 +10,15 @@ class AudioPlayer:
         self.__thread = None
         self.__sample = None
         self.__stream = None
+        self.__index = 0
         self.__is_play = False
         self.__is_pause = True
+        self.__file_length = 0
 
         self.__p = pyaudio.PyAudio()
 
     def get_file_length(self):
-        return self.__audio.duration_seconds
+        return self.__file_length
 
     def load(self):
         file_path = askopenfilename(filetypes=[("音频文件", "*.flac;*.mp3")])
@@ -26,6 +28,7 @@ class AudioPlayer:
                 self.__stream.close()
             self.__index = 0
             audio = AudioSegment.from_file(file_path).set_sample_width(2)
+            self.__file_length = audio.duration_seconds
             self.__sample = np.array(audio.get_array_of_samples()).reshape(-1, 2)
             self.__stream = self.__p.open(
                 format=self.__p.get_format_from_width(audio.sample_width),
@@ -68,5 +71,4 @@ class AudioPlayer:
 
     def reset(self):
         self.pause()
-        self.__thread = None
         self.__index = 0
