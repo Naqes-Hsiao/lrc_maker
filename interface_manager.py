@@ -49,14 +49,14 @@ class InterfaceManager:
         frame_audio = tk.Frame(self.frame_right)
         frame_audio.pack()
 
-        self.plus_btn = tk.Button(frame_audio, text="-1s", command=self.plus)
+        self.plus_btn = tk.Button(frame_audio, text="-1s", command=self.minus)
         self.plus_btn.grid(row=0, column=0, padx=10, pady=10)
 
         self.play_btn = tk.Button(frame_audio, text="播放", command=self.toggle_play)
         self.play_btn.grid(row=0, column=1, padx=10, pady=10)
 
-        self.minus_btn = tk.Button(frame_audio, text="+1s", command=self.minus)
-        self.minus_btn.grid(row=0, column=2, padx=10, pady=10)
+        self.plus_btn = tk.Button(frame_audio, text="+1s", command=self.plus)
+        self.plus_btn.grid(row=0, column=2, padx=10, pady=10)
 
     def _create_load_buttons(self):
         frame_load = tk.Frame(self.frame_right)
@@ -125,10 +125,18 @@ class InterfaceManager:
             self.progress_bar.set(0)
 
     def plus(self):
-        pass
+        self.start_drag(None)
+        position = self.progress_bar.get()
+        self.progress_bar.set(position + 1)
+        self.drag_progress(None)
+        self.end_drag(None)
 
     def minus(self):
-        pass
+        self.start_drag(None)
+        position = self.progress_bar.get()
+        self.progress_bar.set(position - 1)
+        self.drag_progress(None)
+        self.end_drag(None)
 
     def load_audio(self):
         self.audio_player.pause()
