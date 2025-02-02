@@ -6,11 +6,10 @@ class LrcManager:
     def __init__(self):
         self.__file_path = None
         self.__file_lines = None
-        self.__file_length = 0
         self.__file_index = 0
 
     def get_file_length(self):
-        return self.__file_length
+        return len(self.__file_lines)
 
     def get_file_lines(self):
         return self.__file_lines
@@ -28,7 +27,6 @@ class LrcManager:
             self.__file_index = 0
             with open(self.__file_path, "r", encoding="utf-8") as file:
                 self.__file_lines = file.readlines()
-                self.__file_length = len(self.__file_lines)
         else:
             self.__file_path = temp_file_path
         return self.__file_path
@@ -44,42 +42,40 @@ class LrcManager:
 
     def change_timestamp(self):
         # 遍历歌词文件行数，并获取当前行
-        for index in range(self.__file_length):
-            lrc_str = self.__file_lines[index]
+        for index, line in enumerate(self.__file_lines):
             # 判断歌词格式是否匹配，如果当前行包含"]"和"<"，则进行时间戳转换
-            if "]" in lrc_str and "<" in lrc_str:
+            if "]" in line and "<" in line:
                 # 将当前行按"<"分割，得到目标时间和转换时间
-                character_lst = lrc_str.split("<")
+                str_lst = line.split("<")
                 # 计算目标时间和转换时间的时间差
-                difference_minute, difference_second = self._calculate_difference(character_lst)
+                difference_minute, difference_second = self._calculate_difference(str_lst)
                 # 调整时间戳
-                self._change_timstamp(character_lst, difference_minute, difference_second)
+                self._change_timstamp(str_lst, difference_minute, difference_second)
                 # 将调整后的时间戳重新拼接
-                self.__file_lines[index] = "<".join(character_lst)
+                self.__file_lines[index] = "<".join(str_lst)
 
-    def _change_timstamp(self, character_lst, difference_minute, difference_second):
-        for time_index in range(1, len(character_lst)):
-            change_time = character_lst[time_index]
+    def _calculate_difference(self, str_lst):
+        target_time, change_time = str_lst[0], str_lst[1]
+        # 解析目标时间和转换时间，得到分钟和秒
+        target_minute, target_second, _ = self._match_str(target_time)
+        change_minute, change_second, _ = self._match_str(change_time)
+        return target_minute - change_minute, target_second - change_second
+
+    def _change_timstamp(self, str_lst, difference_minute, difference_second):
+        for index, str in enumerate(str_lst[1:], 1):
             # 解析当前时间，得到分钟、 秒和歌词
-            change_minute, change_second, lrc_str = self._match_str(change_time)
+            change_minute, change_second, lrc_str = self._match_str(str)
             # 将时间差加到当前时间上
             change_minute += difference_minute
             change_second += difference_second
             # 调整时间，确保分钟和秒在合理范围内
             change_minute, change_second = self._adjust_time(change_minute * 60 + change_second)
             # 将转换后的时间重新拼接
-            character_lst[time_index] = f"{change_minute}:{change_second}{lrc_str}"
+            str_lst[index] = f"{change_minute}:{change_second}{lrc_str}"
 
-    def _calculate_difference(self, character_lst):
-        target_time, change_time = character_lst[0], character_lst[1]
-        # 解析目标时间和转换时间，得到分钟和秒
-        target_minute, target_second, _ = self._match_str(target_time)
-        change_minute, change_second, _ = self._match_str(change_time)
-        return target_minute - change_minute, target_second - change_second
-
-    def _match_str(self, time_str):
+    def _match_str(self, str):
         pattern = re.compile(r"\[?0(\d):(\d{2}\.\d+)(.*\n?)")
-        match = pattern.match(time_str)
+        match = pattern.match(str)
         return int(match.group(1)), float(match.group(2)), match.group(3)
 
     def _adjust_time(self, time):
@@ -92,9 +88,10 @@ class LrcManager:
         return minute, second
 
     def reset_lrc(self):
-        for index in range(self.__file_length):
-            if "]" in self.__file_lines[index]:
-                self.__file_lines[index] = self.__file_lines[index].split("]")[1]
+        for index in range(len(self.__file_lines)):
+            if "]" not in self.__file_lines[index]:
+                break
+            self.__file_lines[index] = self.__file_lines[index].split("]")[1]
         self.__file_index = 0
 
     def save(self):
