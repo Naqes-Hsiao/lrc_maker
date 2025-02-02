@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import font
 import tkinter.messagebox as msgbox
 from audio_player import AudioPlayer
 from lrc_manager import LrcManager
@@ -24,9 +25,10 @@ class InterfaceManager:
         self._create_lrc_text()
 
     def _configure_layout(self):
-        for index in range(2, -1, -1):
-            self.window.rowconfigure(index, weight=1)
-            self.window.columnconfigure(index, weight=index + 1)
+        self.window.rowconfigure(0, weight=1)
+        self.window.rowconfigure(1, weight=1)
+        self.window.columnconfigure(0, weight=2)
+        self.window.columnconfigure(1, weight=1)
 
     def _create_frames(self):
         self.frame_left = tk.Frame(self.window)
@@ -209,9 +211,22 @@ class InterfaceManager:
         start_index = f"{line_num}.0"
         end_index = f"{line_num}.end"
         self.lrc_text.tag_add("highlight", start_index, end_index)
-        self._scroll_lrc_text()
+        self._scroll_lrc_text(line_num)
 
-    def _scroll_lrc_text(self):
-        if self.lrc_manager.get_index() > 5:
-            scroll_distance = (self.lrc_manager.get_index() - 5) * 3
-            self.lrc_text.yview_scroll(scroll_distance, "units")
+    def _scroll_lrc_text(self, line_num):
+        if line_num == 1:
+            return
+        line_count = int(self.lrc_text.count("1.0", "end", "displaylines")[0])
+        text_font = font.Font(font=self.lrc_text["font"])
+        line_height = text_font.metrics("linespace")
+        total_height = line_count * line_height
+
+        real_num = self.lrc_text.count("1.0", f"{line_num}.0", "displaylines")[0]
+        position = real_num * line_height
+
+        text_height = self.lrc_text.winfo_height()
+        half = text_height >> 1
+
+        if position > half:
+            percent = (position - half) / total_height
+            self.lrc_text.yview_moveto(percent)
