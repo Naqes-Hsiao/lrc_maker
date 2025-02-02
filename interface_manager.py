@@ -12,7 +12,6 @@ class InterfaceManager:
 
         self.audio_player = AudioPlayer()
         self.lrc_manager = LrcManager()
-        self.sum_of_line = 0
 
         self.create_widgets()
         self._update_progress()
@@ -143,13 +142,11 @@ class InterfaceManager:
         if self.lrc_manager.load():
             self.load_lrc_btn.config(text="重新加载歌词文件")
             self._update_lrc()
-            self._scroll_lrc_text()
 
     def undo(self):
         if self.load_lrc_btn.cget("text") == "重新加载歌词文件":
             self.lrc_manager.undo()
             self._update_lrc()
-            self._scroll_lrc_text()
         else:
             msgbox.showerror("错误", "请先加载歌词文件")
 
@@ -159,7 +156,6 @@ class InterfaceManager:
                 current_time = self.audio_player.get_position()
                 self.lrc_manager.timestamp(current_time)
                 self._update_lrc()
-                self._scroll_lrc_text()
             else:
                 msgbox.showerror("错误", "请先加载音频文件")
         else:
@@ -173,7 +169,6 @@ class InterfaceManager:
             elif action == "save":
                 msgbox.showinfo("提示", "保存成功")
             self._update_lrc()
-            self._scroll_lrc_text()
         else:
             msgbox.showerror("错误", "请先加载歌词文件")
 
@@ -195,11 +190,11 @@ class InterfaceManager:
         self.progress_bar.set(0)
 
     def highlight_click(self, _):
-        self.lrc_text.tag_remove("highlight", "1.0", tk.END)
         line_num = int(self.lrc_text.index(tk.CURRENT).split(".")[0])
-        if ~(line_num ^ 1):
-            self._highlight(line_num)
+        if line_num % 2 != 0:
+            self.lrc_text.tag_remove("highlight", "1.0", tk.END)
             self.lrc_manager.set_index((line_num - 1) >> 1)
+            self._highlight(line_num)
 
     def _update_lrc(self):
         self.lrc_text.config(state=tk.NORMAL)
@@ -214,6 +209,9 @@ class InterfaceManager:
         start_index = f"{line_num}.0"
         end_index = f"{line_num}.end"
         self.lrc_text.tag_add("highlight", start_index, end_index)
+        self._scroll_lrc_text()
 
     def _scroll_lrc_text(self):
-        pass
+        if self.lrc_manager.get_index() > 5:
+            scroll_distance = (self.lrc_manager.get_index() - 5) * 3
+            self.lrc_text.yview_scroll(scroll_distance, "units")

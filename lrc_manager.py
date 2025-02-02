@@ -27,7 +27,7 @@ class LrcManager:
             with open(self.__file_path, "r", encoding="utf-8") as file:
                 self.__file_lines = file.readlines()
             self.__index = 0
-            self._location(self.__index, len(self.__file_lines), 1)
+            self._location(self.__index, len(self.__file_lines) - 1, 1)
         else:
             self.__file_path = temp_file_path
         return self.__file_path
@@ -41,7 +41,7 @@ class LrcManager:
         if "]" not in self.__file_lines[self.__index]:
             minute, second = self._adjust_time(time)
             self.__file_lines[self.__index] = f"[{minute}:{second}]{self.__file_lines[self.__index]}"
-        self._location(self.__index, len(self.__file_lines), 1)
+        self._location(self.__index, len(self.__file_lines) - 1, 1)
 
     def _location(self, start, end, direction):
         for line in self.__file_lines[start:end:direction]:
