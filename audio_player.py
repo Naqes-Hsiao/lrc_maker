@@ -13,6 +13,7 @@ class AudioPlayer:
         self.__index = 0
         self.__is_play = False
         self.__is_pause = True
+        self.__has_thread = False
 
         self.__p = pyaudio.PyAudio()
 
@@ -41,12 +42,15 @@ class AudioPlayer:
             if self.__index == len(self.__sample) - 1:
                 self.__is_play = False
                 break
+        self.__has_thread = False
 
     def play(self):
         self.__is_play = True
         self.__is_pause = False
-        thread = Thread(target=self._play, daemon=True)
-        thread.start()
+        if not self.__has_thread:
+            self.__has_thread = True
+            thread = Thread(target=self._play, daemon=True)
+            thread.start()
 
     def pause(self):
         self.__is_play = False
