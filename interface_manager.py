@@ -21,8 +21,8 @@ class InterfaceManager:
         self._create_frames()
         self._create_progress_bar()
         self._create_audio_buttons()
+        self._create_load_buttons()
         self._create_lrc_buttons()
-        self._create_additional_buttons()
         self._create_lrc_text()
 
     def _configure_layout(self):
@@ -39,53 +39,56 @@ class InterfaceManager:
         self.frame_right.grid(row=0, column=1, pady=10)
 
     def _create_progress_bar(self):
-        self.frame_progress_bar = tk.Frame(self.frame_right)
-        self.frame_progress_bar.pack()
-
-        self.progress_bar = tk.Scale(self.frame_progress_bar, from_=0, to=100, orient=tk.HORIZONTAL, length=400, tickinterval=10)
+        self.progress_bar = tk.Scale(self.frame_right, orient=tk.HORIZONTAL, length=400)
         self.progress_bar.pack(pady=10)
         self.progress_bar.bind("<ButtonPress-1>", self.start_drag)
         self.progress_bar.bind("<B1-Motion>", self.drag_progress)
         self.progress_bar.bind("<ButtonRelease-1>", self.end_drag)
 
     def _create_audio_buttons(self):
-        self.frame_audio = tk.Frame(self.frame_right)
-        self.frame_audio.pack()
+        frame_audio = tk.Frame(self.frame_right)
+        frame_audio.pack()
 
-        self.load_audio_btn = tk.Button(self.frame_audio, text="加载音频文件", command=self.load_audio)
-        self.load_audio_btn.grid(row=0, column=0, padx=10, pady=10)
+        self.plus_btn = tk.Button(frame_audio, text="-1s", command=self.plus)
+        self.plus_btn.grid(row=0, column=0, padx=10, pady=10)
 
-        self.play_btn = tk.Button(self.frame_audio, text="播放", command=self.toggle_play)
+        self.play_btn = tk.Button(frame_audio, text="播放", command=self.toggle_play)
         self.play_btn.grid(row=0, column=1, padx=10, pady=10)
 
+        self.minus_btn = tk.Button(frame_audio, text="+1s", command=self.minus)
+        self.minus_btn.grid(row=0, column=2, padx=10, pady=10)
+
+    def _create_load_buttons(self):
+        frame_load = tk.Frame(self.frame_right)
+        frame_load.pack()
+
+        self.load_audio_btn = tk.Button(frame_load, text="加载音频文件", command=self.load_audio)
+        self.load_audio_btn.grid(row=0, column=0, padx=10, pady=10)
+
+        self.load_lrc_btn = tk.Button(frame_load, text="加载歌词文件", command=self.load_lrc)
+        self.load_lrc_btn.grid(row=0, column=1, padx=10, pady=10)
+
     def _create_lrc_buttons(self):
-        self.frame_lrc = tk.Frame(self.frame_right)
-        self.frame_lrc.pack(side=tk.TOP)
+        frame_lrc = tk.Frame(self.frame_right)
+        frame_lrc.pack()
 
-        self.load_lrc_btn = tk.Button(self.frame_lrc, text="加载歌词文件", command=self.load_lrc)
-        self.load_lrc_btn.grid(row=0, column=0, padx=10, pady=10)
+        self.undo_btn = tk.Button(frame_lrc, text="撤销", command=self.undo)
+        self.undo_btn.grid(row=0, column=0, padx=10, pady=10)
 
-        self.undo_btn = tk.Button(self.frame_lrc, text="撤销", command=self.undo)
-        self.undo_btn.grid(row=0, column=1, padx=10, pady=10)
+        self.timestamp_btn = tk.Button(frame_lrc, text="打轴", command=self.timestamp)
+        self.timestamp_btn.grid(row=0, column=1, padx=10, pady=10)
 
-        self.timestamp_btn = tk.Button(self.frame_lrc, text="打轴", command=self.timestamp)
-        self.timestamp_btn.grid(row=0, column=2, padx=10, pady=10)
+        self.reset_lrc_btn = tk.Button(frame_lrc, text="重置歌词", command=self.reset_lrc)
+        self.reset_lrc_btn.grid(row=1, column=0, padx=10, pady=10)
 
-    def _create_additional_buttons(self):
-        self.frame_bottom = tk.Frame(self.frame_right)
-        self.frame_bottom.pack(side=tk.TOP)
+        self.change_timestamp_btn = tk.Button(frame_lrc, text="逐字调整", command=self.change_timestamp)
+        self.change_timestamp_btn.grid(row=1, column=1, padx=10, pady=10)
 
-        self.change_timestamp_btn = tk.Button(self.frame_bottom, text="逐字调整", command=self.change_timestamp)
-        self.change_timestamp_btn.grid(row=0, column=0, padx=10, pady=10)
+        self.reset_btn = tk.Button(frame_lrc, text="重置", command=self.reset)
+        self.reset_btn.grid(row=2, column=0, padx=10, pady=10)
 
-        self.reset_lrc_btn = tk.Button(self.frame_bottom, text="重置歌词", command=self.reset_lrc)
-        self.reset_lrc_btn.grid(row=0, column=1, padx=10, pady=10)
-
-        self.save_btn = tk.Button(self.frame_bottom, text="保存", command=self.save)
-        self.save_btn.grid(row=0, column=2, padx=10, pady=10)
-
-        self.reset_btn = tk.Button(self.frame_right, text="重置", command=self.reset)
-        self.reset_btn.pack(pady=10)
+        self.save_btn = tk.Button(frame_lrc, text="保存", command=self.save)
+        self.save_btn.grid(row=2, column=1, padx=10, pady=10)
 
     def _create_lrc_text(self):
         self.lrc_text = tk.Text(self.frame_left, width=100, height=50, font=("宋体", 12))
@@ -121,12 +124,19 @@ class InterfaceManager:
             msgbox.showerror("错误", "请先加载音频文件")
             self.progress_bar.set(0)
 
+    def plus(self):
+        pass
+
+    def minus(self):
+        pass
+
     def load_audio(self):
         self.audio_player.pause()
         if self.audio_player.load():
             self.load_audio_btn.config(text="重新加载音频文件")
             self.play_btn.config(text="播放")
             self.progress_bar.set(0)
+            self.progress_bar.config(to=self.audio_player.get_file_length())
 
     def toggle_play(self):
         if self.load_audio_btn.cget("text") == "重新加载音频文件":
@@ -158,7 +168,7 @@ class InterfaceManager:
     def timestamp(self):
         if self.load_lrc_btn.cget("text") == "重新加载歌词文件":
             if self.load_audio_btn.cget("text") == "重新加载音频文件":
-                current_time = self.audio_player.get_position() / 100 * self.audio_player.get_file_length()
+                current_time = self.audio_player.get_position()
                 self.lrc_manager.timestamp(self.lrc_manager.get_file_index(), current_time)
                 self._update_lrc()
                 self._location(self.lrc_manager.get_file_index(), self.lrc_manager.get_file_length() - 1, 1)
@@ -232,10 +242,9 @@ class InterfaceManager:
         for line in self.lrc_manager.get_file_lines()[start:end:direction]:
             condition_timestamp = direction == 1 and "]" in line
             condition_undo = direction == -1 and not "]" in line
-            if condition_timestamp or condition_undo:
-                self.lrc_manager.set_file_index(self.lrc_manager.get_file_index() + direction)
-            else:
+            if not (condition_timestamp or condition_undo):
                 break
+            self.lrc_manager.set_file_index(self.lrc_manager.get_file_index() + direction)
         start_index = f"{(self.lrc_manager.get_file_index() << 1) + 1}.0"
         end_index = f"{(self.lrc_manager.get_file_index() << 1) + 1}.end"
         self.lrc_text.tag_add("highlight", start_index, end_index)
