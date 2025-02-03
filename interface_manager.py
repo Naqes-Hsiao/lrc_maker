@@ -71,7 +71,7 @@ class InterfaceManager:
         frame_lrc = tk.Frame(self.frame_right)
         frame_lrc.pack()
         btns_lrc = [
-            ("撤销", self.undo),
+            ("撤销", lambda: self.lrc_action("undo")),
             ("打轴", self.timestamp),
             ("重置歌词", lambda: self.lrc_action("reset_lrc")),
             ("逐字调整", lambda: self.lrc_action("change_timestamp")),
@@ -147,13 +147,6 @@ class InterfaceManager:
             self.load_lrc_btn.config(text="重新加载歌词文件")
             self._update_lrc()
 
-    def undo(self):
-        if self.lrc_manager.is_load():
-            self.lrc_manager.undo()
-            self._update_lrc()
-        else:
-            msgbox.showerror("错误", "请先加载歌词文件")
-
     def timestamp(self):
         if self.lrc_manager.is_load():
             if self.audio_player.is_load():
@@ -197,7 +190,7 @@ class InterfaceManager:
         line_num = int(self.lrc_text.index(tk.CURRENT).split(".")[0])
         if line_num % 2 != 0:
             self.lrc_text.tag_remove("highlight", "1.0", tk.END)
-            self.lrc_manager.set_index((line_num - 1) >> 1)
+            self.lrc_manager.set_file_index((line_num - 1) >> 1)
             self._highlight(line_num)
 
     def _update_lrc(self):
@@ -206,7 +199,7 @@ class InterfaceManager:
         for line in self.lrc_manager.get_file_lines():
             self.lrc_text.insert(tk.END, line + "\n")
         self.lrc_text.config(state=tk.DISABLED)
-        line_num = (self.lrc_manager.get_index() << 1) + 1
+        line_num = (self.lrc_manager.get_file_index() << 1) + 1
         self._highlight(line_num)
 
     def _highlight(self, line_num):

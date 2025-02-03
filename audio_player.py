@@ -10,7 +10,7 @@ class AudioPlayer:
         self.__audio = None
         self.__sample = None
         self.__stream = None
-        self.__index = 0
+        self.__file_index = 0
 
         self.__is_load = False
         self.__is_play = False
@@ -34,7 +34,7 @@ class AudioPlayer:
             if self.__is_play:
                 self.pause()
                 self.__stream.close()
-            self.__index = 0
+            self.__file_index = 0
             self.__audio = AudioSegment.from_file(file_path).set_sample_width(2)
             self.__sample = np.array(self.__audio.get_array_of_samples()).reshape(-1, 2)
             self.__stream = self.__p.open(
@@ -45,9 +45,9 @@ class AudioPlayer:
 
     def _play(self):
         while self.__is_play:
-            self.__stream.write(self.__sample[self.__index:self.__index + 1].tobytes())
-            self.__index += 1
-            if self.__index == len(self.__sample) - 1:
+            self.__stream.write(self.__sample[self.__file_index:self.__file_index + 1].tobytes())
+            self.__file_index += 1
+            if self.__file_index == len(self.__sample) - 1:
                 self.__is_play = False
                 break
         self.__has_thread = False
@@ -65,21 +65,21 @@ class AudioPlayer:
         self.__is_pause = True
 
     def get_position(self):
-        return self.__index / self.__audio.frame_rate
+        return self.__file_index / self.__audio.frame_rate
 
     def set_position(self, position):
-        self.__index = int(position * self.__audio.frame_rate)
+        self.__file_index = int(position * self.__audio.frame_rate)
 
     def restart(self):
         # 当播放结束时，并未按下暂停键，而是直接点击播放键时，需要重置播放状态
         is_over = not self.__is_play and not self.__is_pause
         if is_over:
             self.pause()
-            self.__index = 0
+            self.__file_index = 0
             self.__is_pause = True
         return is_over
 
     def reset(self):
         self.pause()
         self.__is_load = False
-        self.__index = 0
+        self.__file_index = 0

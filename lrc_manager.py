@@ -6,7 +6,7 @@ class LrcManager:
     def __init__(self):
         self.__file_path = None
         self.__file_lines = None
-        self.__index = 0
+        self.__file_index = 0
 
         self.__is_load = False
 
@@ -19,11 +19,11 @@ class LrcManager:
     def get_file_lines(self):
         return self.__file_lines
 
-    def get_index(self):
-        return self.__index
+    def get_file_index(self):
+        return self.__file_index
 
-    def set_index(self, index):
-        self.__index = index
+    def set_file_index(self, index):
+        self.__file_index = index
 
     def load(self):
         temp_file_path = self.__file_path
@@ -31,22 +31,22 @@ class LrcManager:
         if self.__file_path:
             with open(self.__file_path, "r", encoding="utf-8") as file:
                 self.__file_lines = file.readlines()
-            self.__index = 0
+            self.__file_index = 0
             self._location(0, len(self.__file_lines) - 1, 1)
             self.__is_load = True
         else:
             self.__file_path = temp_file_path
 
     def undo(self):
-        if "]" in self.__file_lines[self.__index]:
-            self.__file_lines[self.__index] = self.__file_lines[self.__index].split("]")[1]
-        self._location(self.__index, 0, -1)
+        if "]" in self.__file_lines[self.__file_index]:
+            self.__file_lines[self.__file_index] = self.__file_lines[self.__file_index].split("]")[1]
+        self._location(self.__file_index, 0, -1)
 
     def timestamp(self, time):
-        if "]" not in self.__file_lines[self.__index]:
+        if "]" not in self.__file_lines[self.__file_index]:
             minute, second = self._adjust_time(time)
-            self.__file_lines[self.__index] = f"[{minute}:{second}]{self.__file_lines[self.__index]}"
-        self._location(self.__index, len(self.__file_lines) - 1, 1)
+            self.__file_lines[self.__file_index] = f"[{minute}:{second}]{self.__file_lines[self.__file_index]}"
+        self._location(self.__file_index, len(self.__file_lines) - 1, 1)
 
     def _location(self, start, end, direction):
         for line in self.__file_lines[start:end:direction]:
@@ -54,7 +54,7 @@ class LrcManager:
             condition_undo = direction == -1 and not "]" in line
             if not (condition_timestamp or condition_undo):
                 break
-            self.__index += direction
+            self.__file_index += direction
 
     def change_timestamp(self):
         # 遍历歌词文件行数，并获取当前行
@@ -108,7 +108,7 @@ class LrcManager:
             if "]" not in self.__file_lines[index]:
                 break
             self.__file_lines[index] = self.__file_lines[index].split("]")[1]
-        self.__index = 0
+        self.__file_index = 0
 
     def save(self):
         with open(self.__file_path, "w", encoding="utf-8") as file:
@@ -116,4 +116,4 @@ class LrcManager:
 
     def reset(self):
         self.__is_load = False
-        self.__index = 0
+        self.__file_index = 0
