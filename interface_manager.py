@@ -218,17 +218,19 @@ class InterfaceManager:
     def _scroll_lrc_text(self, line_num):
         if line_num == 1:
             return
-        line_count = int(self.lrc_text.count("1.0", "end", "displaylines")[0])
+
+        line_count = self.lrc_text.count("1.0", "end", "displaylines")[0]
         text_font = font.Font(font=self.lrc_text["font"])
         line_height = text_font.metrics("linespace")
         total_height = line_count * line_height
 
-        real_num = self.lrc_text.count("1.0", f"{line_num}.0", "displaylines")[0]
-        position = real_num * line_height
+        current_count = self.lrc_text.count("1.0", f"{line_num}.0", "displaylines")[0]
+        current_height = current_count * line_height
 
-        text_height = self.lrc_text.winfo_height()
-        half = text_height >> 1
+        half_text_height = self.lrc_text.winfo_height() >> 1
 
-        if position > half:
-            percent = (position - half) / total_height
+        if current_height > half_text_height:
+            percent = (current_height - half_text_height) / total_height
             self.lrc_text.yview_moveto(percent)
+        else:
+            self.lrc_text.yview_moveto(0)
