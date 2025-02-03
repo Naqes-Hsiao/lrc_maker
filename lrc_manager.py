@@ -8,6 +8,11 @@ class LrcManager:
         self.__file_lines = None
         self.__index = 0
 
+        self.__is_load = False
+
+    def is_load(self):
+        return self.__is_load
+
     def get_file_length(self):
         return len(self.__file_lines)
 
@@ -28,9 +33,9 @@ class LrcManager:
                 self.__file_lines = file.readlines()
             self.__index = 0
             self._location(0, len(self.__file_lines) - 1, 1)
+            self.__is_load = True
         else:
             self.__file_path = temp_file_path
-        return self.__file_path
 
     def undo(self):
         if "]" in self.__file_lines[self.__index]:
@@ -110,5 +115,5 @@ class LrcManager:
             file.writelines(self.__file_lines)
 
     def reset(self):
-        self.__file_path = None
+        self.__is_load = False
         self.__index = 0

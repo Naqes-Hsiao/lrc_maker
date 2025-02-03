@@ -81,4 +81,5 @@ class AudioPlayer:
 
     def reset(self):
         self.pause()
+        self.__is_load = False
         self.__index = 0
