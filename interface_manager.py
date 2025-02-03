@@ -127,7 +127,7 @@ class InterfaceManager:
         if self.audio_player.is_load():
             self.load_audio_btn.config(text="重新加载音频文件")
             self.play_btn.config(text="播放")
-            self.progress_bar.set(0)
+            self.progress_bar.set(self.audio_player.get_position())
             self.progress_bar.config(to=self.audio_player.get_file_length())
 
     def toggle_play(self):
