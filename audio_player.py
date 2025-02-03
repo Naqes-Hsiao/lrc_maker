@@ -11,11 +11,19 @@ class AudioPlayer:
         self.__sample = None
         self.__stream = None
         self.__index = 0
+
+        self.__is_load = False
         self.__is_play = False
         self.__is_pause = True
         self.__has_thread = False
 
         self.__p = pyaudio.PyAudio()
+
+    def is_load(self):
+        return self.__is_load
+
+    def is_play(self):
+        return self.__is_play
 
     def get_file_length(self):
         return self.__audio.duration_seconds
@@ -33,7 +41,7 @@ class AudioPlayer:
                 format=self.__p.get_format_from_width(self.__audio.sample_width),
                 channels=2, rate=self.__audio.frame_rate, output=True
             )
-        return file_path
+            self.__is_load = True
 
     def _play(self):
         while self.__is_play:

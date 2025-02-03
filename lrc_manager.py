@@ -27,7 +27,7 @@ class LrcManager:
             with open(self.__file_path, "r", encoding="utf-8") as file:
                 self.__file_lines = file.readlines()
             self.__index = 0
-            self._location(self.__index, len(self.__file_lines) - 1, 1)
+            self._location(0, len(self.__file_lines) - 1, 1)
         else:
             self.__file_path = temp_file_path
         return self.__file_path
@@ -106,9 +106,8 @@ class LrcManager:
         self.__index = 0
 
     def save(self):
-        if self.__file_path:
-            with open(self.__file_path, "w", encoding="utf-8") as file:
-                file.writelines(self.__file_lines)
+        with open(self.__file_path, "w", encoding="utf-8") as file:
+            file.writelines(self.__file_lines)
 
     def reset(self):
         self.__file_path = None

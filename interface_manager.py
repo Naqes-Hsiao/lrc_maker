@@ -93,7 +93,7 @@ class InterfaceManager:
         self.lrc_text.bind("<Button-1>", self.highlight_click)
 
     def _update_progress(self):
-        if self.play_btn.cget("text") == "暂停":
+        if self.audio_player.is_play():
             position = self.audio_player.get_position()
             self.progress_bar.set(position)
             if self.audio_player.restart():
@@ -102,8 +102,8 @@ class InterfaceManager:
         self.progress_bar.after(1000, self._update_progress)
 
     def seek_progress(self, _, action):
-        if self.load_audio_btn.cget("text") == "重新加载音频文件":
-            if action == "start" and self.play_btn.cget("text") == "暂停":
+        if self.audio_player.is_load():
+            if action == "start" and self.audio_player.is_play():
                 self.audio_player.pause()
                 self.play_btn.config(text="播放")
             elif action == "drag":
@@ -111,7 +111,7 @@ class InterfaceManager:
             elif action == "end":
                 self.audio_player.play()
                 self.play_btn.config(text="暂停")
-        else:
+        elif not self.audio_player.is_load() and action == "end":
             msgbox.showerror("错误", "请先加载音频文件")
             self.progress_bar.set(0)
 
@@ -123,15 +123,16 @@ class InterfaceManager:
 
     def load_audio(self):
         self.audio_player.pause()
-        if self.audio_player.load():
+        self.audio_player.load()
+        if self.audio_player.is_load():
             self.load_audio_btn.config(text="重新加载音频文件")
             self.play_btn.config(text="播放")
             self.progress_bar.set(0)
             self.progress_bar.config(to=self.audio_player.get_file_length())
 
     def toggle_play(self):
-        if self.load_audio_btn.cget("text") == "重新加载音频文件":
-            if self.play_btn.cget("text") == "播放":
+        if self.audio_player.is_load():
+            if not self.audio_player.is_play():
                 self.audio_player.play()
                 self.play_btn.config(text="暂停")
             else:
