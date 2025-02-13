@@ -209,21 +209,32 @@ class InterfaceManager:
         self._scroll_lrc_text(line_num)
 
     def _scroll_lrc_text(self, line_num):
+        # 如果行号为1，则不执行滚动操作
         if line_num == 1:
             return
 
+        # 获取lrc_text中从1.0到end的行数
         line_count = self.lrc_text.count("1.0", "end", "displaylines")[0]
+        # 获取lrc_text的字体
         text_font = font.Font(font=self.lrc_text["font"])
+        # 获取每行的高度
         line_height = text_font.metrics("linespace")
+        # 计算总高度
         total_height = line_count * line_height
 
+        # 获取从1.0到当前行号的行数
         current_count = self.lrc_text.count("1.0", f"{line_num}.0", "displaylines")[0]
+        # 计算当前行号的高度
         current_height = current_count * line_height
 
+        # 获取lrc_text的半高度
         half_text_height = self.lrc_text.winfo_height() >> 1
 
+        # 如果当前行号的高度大于半高度，则滚动到当前行号的位置
         if current_height > half_text_height:
+            # 计算滚动百分比
             percent = (current_height - half_text_height) / total_height
             self.lrc_text.yview_moveto(percent)
+        # 否则滚动到顶部
         else:
             self.lrc_text.yview_moveto(0)
