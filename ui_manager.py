@@ -38,8 +38,10 @@ class UIManager:
         self.frame_right.grid(row=0, column=1, pady=10)
 
     def _create_progress_bar(self):
+        self.progress = tk.Label(self.frame_right, text="00:00 / 00:00")
+        self.progress.pack()
         self.progress_bar = tk.Scale(self.frame_right, orient=tk.HORIZONTAL, length=400)
-        self.progress_bar.pack(pady=10)
+        self.progress_bar.pack()
         self.progress_bar.bind("<ButtonPress-1>", lambda e: self.seek_progress(e, "start"))
         self.progress_bar.bind("<B1-Motion>", lambda e: self.seek_progress(e, "drag"))
         self.progress_bar.bind("<ButtonRelease-1>", lambda e: self.seek_progress(e, "end"))
@@ -71,12 +73,12 @@ class UIManager:
         frame_lrc = tk.Frame(self.frame_right)
         frame_lrc.pack()
         btns_lrc = [
-            ("撤销", lambda: self.lrc_action("undo")),
+            ("撤销", lambda: self.modify_lrc("undo")),
             ("打轴", self.timestamp),
-            ("重置歌词", lambda: self.lrc_action("reset_lrc")),
-            ("逐字调整", lambda: self.lrc_action("change_timestamp")),
+            ("重置歌词", lambda: self.modify_lrc("reset_lrc")),
+            ("逐字调整", lambda: self.modify_lrc("change_timestamp")),
             ("重置", self.reset),
-            ("保存", lambda: self.lrc_action("save"))
+            ("保存", lambda: self.modify_lrc("save"))
         ]
         self._create_buttons_in_frame(frame_lrc, btns_lrc)
 
@@ -92,9 +94,27 @@ class UIManager:
         self.lrc_text.tag_config("highlight", background="yellow", foreground="red")
         self.lrc_text.bind("<Button-1>", self.highlight_click)
 
+    def adjust_time(self, time):
+        minute, second = divmod(time, 60)
+        if second < 10:
+            second = f"0{int(second)}"
+        else:
+            second = f"{int(second)}"
+        minute = f"0{int(minute)}"
+        return minute, second
+
+    def set_progress(self, time):
+        length = self.audio_player.get_file_length()
+        total_minute, total_second = self.adjust_time(length)
+        current_minute, current_second = self.adjust_time(time)
+        self.progress.config(
+            text=f"{current_minute}:{current_second} / {total_minute}:{total_second}"
+        )
+
     def _update_progress(self):
         if self.audio_player.is_play():
             position = self.audio_player.get_position()
+            self.set_progress(position)
             self.progress_bar.set(position)
         elif self.audio_player.restart():
             self.progress_bar.set(0)
@@ -127,8 +147,13 @@ class UIManager:
         if self.audio_player.is_load():
             self.load_audio_btn.config(text="重新加载音频文件")
             self.play_btn.config(text="播放")
-            self.progress_bar.set(self.audio_player.get_position())
-            self.progress_bar.config(to=self.audio_player.get_file_length())
+
+            length = self.audio_player.get_file_length()
+            self.progress_bar.config(to=length)
+
+            position = self.audio_player.get_position()
+            self.set_progress(position)
+            self.progress_bar.set(position)
 
     def toggle_play(self):
         if self.audio_player.is_load():
@@ -158,7 +183,7 @@ class UIManager:
         else:
             msgbox.showerror("错误", "请先加载歌词文件")
 
-    def lrc_action(self, action):
+    def modify_lrc(self, action):
         if self.lrc_manager.is_load():
             getattr(self.lrc_manager, action)()
             if action == "change_timestamp":
