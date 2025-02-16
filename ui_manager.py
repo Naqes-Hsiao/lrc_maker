@@ -113,12 +113,12 @@ class UIManager:
 
     def _update_progress(self):
         if self.audio_player.is_play():
-            position = self.audio_player.get_position()
-            self.set_progress(position)
-            self.progress_bar.set(position)
+            self.progress_bar.set(self.audio_player.get_position())
+            self.set_progress(self.progress_bar.get())
         elif self.audio_player.restart():
             self.progress_bar.set(0)
             self.play_btn.config(text="播放")
+            self.set_progress(self.progress_bar.get())
         self.progress_bar.after(1000, self._update_progress)
 
     def seek_progress(self, _, action):
@@ -148,12 +148,10 @@ class UIManager:
             self.load_audio_btn.config(text="重新加载音频文件")
             self.play_btn.config(text="播放")
 
-            length = self.audio_player.get_file_length()
-            self.progress_bar.config(to=length)
+            self.progress_bar.config(to=self.audio_player.get_file_length())
 
-            position = self.audio_player.get_position()
-            self.set_progress(position)
-            self.progress_bar.set(position)
+            self.progress_bar.set(self.audio_player.get_position())
+            self.set_progress(self.progress_bar.get())
 
     def toggle_play(self):
         if self.audio_player.is_load():
