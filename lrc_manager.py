@@ -5,8 +5,8 @@ import re
 class LrcManager:
     def __init__(self):
         self.__file_path = None
-        self.__file_cols = None
-        self.__col_num = 0
+        self.__file_lines = None
+        self.__line_nums = 0
 
         self.__is_load = False
 
@@ -14,51 +14,51 @@ class LrcManager:
         return self.__is_load
 
     def get_file_length(self):
-        return len(self.__file_cols)
+        return len(self.__file_lines)
 
     def get_file_lines(self):
-        return self.__file_cols
+        return self.__file_lines
 
     def get_file_index(self):
-        return self.__col_num
+        return self.__line_nums
 
     def set_file_index(self, index):
-        self.__col_num = index
+        self.__line_nums = index
 
     def load(self):
         temp_file_path = self.__file_path
         self.__file_path = askopenfilename(filetypes=[("歌词文件", "*.lrc")])
         if self.__file_path:
             with open(self.__file_path, "r", encoding="utf-8") as file:
-                self.__file_cols = file.readlines()
-            self.__col_num = 0
-            self._location(0, len(self.__file_cols) - 1, 1)
+                self.__file_lines = file.readlines()
+            self.__line_nums = 0
+            self._location(0, len(self.__file_lines) - 1, 1)
             self.__is_load = True
         else:
             self.__file_path = temp_file_path
 
     def undo(self):
-        if "]" in self.__file_cols[self.__col_num]:
-            self.__file_cols[self.__col_num] = self.__file_cols[self.__col_num].split("]")[1]
-        self._location(self.__col_num, 0, -1)
+        if "]" in self.__file_lines[self.__line_nums]:
+            self.__file_lines[self.__line_nums] = self.__file_lines[self.__line_nums].split("]")[1]
+        self._location(self.__line_nums, 0, -1)
 
     def timestamp(self, time):
-        if "]" not in self.__file_cols[self.__col_num]:
+        if "]" not in self.__file_lines[self.__line_nums]:
             minute, second = self._adjust_time(time)
-            self.__file_cols[self.__col_num] = f"[{minute}:{second}]{self.__file_cols[self.__col_num]}"
-        self._location(self.__col_num, len(self.__file_cols) - 1, 1)
+            self.__file_lines[self.__line_nums] = f"[{minute}:{second}]{self.__file_lines[self.__line_nums]}"
+        self._location(self.__line_nums, len(self.__file_lines) - 1, 1)
 
     def _location(self, start, end, direction):
-        for line in self.__file_cols[start:end:direction]:
+        for line in self.__file_lines[start:end:direction]:
             condition_timestamp = direction == 1 and "]" in line
             condition_undo = direction == -1 and not "]" in line
             if not (condition_timestamp or condition_undo):
                 break
-            self.__col_num += direction
+            self.__line_nums += direction
 
     def change_timestamp(self):
         # 遍历歌词文件行数，并获取当前行
-        for index, line in enumerate(self.__file_cols):
+        for index, line in enumerate(self.__file_lines):
             # 判断歌词格式是否匹配，如果当前行包含"]"和"<"，则进行时间戳转换
             if "]" in line and "<" in line:
                 # 将当前行按"<"分割，得到目标时间和转换时间
@@ -68,7 +68,7 @@ class LrcManager:
                 # 调整时间戳
                 self._change_timstamp(str_lst, difference_minute, difference_second)
                 # 将调整后的时间戳重新拼接
-                self.__file_cols[index] = "<".join(str_lst)
+                self.__file_lines[index] = "<".join(str_lst)
 
     def _calculate_difference(self, str_lst):
         target_time, change_time = str_lst[0], str_lst[1]
@@ -104,16 +104,16 @@ class LrcManager:
         return minute, second
 
     def reset_lrc(self):
-        for index in range(len(self.__file_cols)):
-            if "]" not in self.__file_cols[index]:
+        for index in range(len(self.__file_lines)):
+            if "]" not in self.__file_lines[index]:
                 break
-            self.__file_cols[index] = self.__file_cols[index].split("]")[1]
-        self.__col_num = 0
+            self.__file_lines[index] = self.__file_lines[index].split("]")[1]
+        self.__line_nums = 0
 
     def save(self):
         with open(self.__file_path, "w", encoding="utf-8") as file:
-            file.writelines(self.__file_cols)
+            file.writelines(self.__file_lines)
 
     def reset(self):
         self.__is_load = False
-        self.__col_num = 0
+        self.__line_nums = 0
