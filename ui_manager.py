@@ -96,9 +96,9 @@ class UIManager:
         if self.audio_player.is_play():
             position = self.audio_player.get_position()
             self.progress_bar.set(position)
-            if self.audio_player.restart():
-                self.progress_bar.set(0)
-                self.play_btn.config(text="播放")
+        elif self.audio_player.restart():
+            self.progress_bar.set(0)
+            self.play_btn.config(text="播放")
         self.progress_bar.after(1000, self._update_progress)
 
     def seek_progress(self, _, action):
